@@ -1,7 +1,18 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { isDemoMode } from '@/lib/demo/store'
+import { createMockServerClient } from '@/lib/demo/mock-supabase'
 
 export async function createClient() {
+  if (isDemoMode()) {
+    const { cookies } = await import('next/headers')
+    const cookieStore = await cookies()
+    const cookieHeader = cookieStore.getAll()
+      .map(({ name, value }) => `${name}=${value}`)
+      .join('; ')
+    return createMockServerClient(cookieHeader) as ReturnType<typeof import('@supabase/ssr').createServerClient>
+  }
+
+  const { createServerClient } = await import('@supabase/ssr')
+  const { cookies } = await import('next/headers')
   const cookieStore = await cookies()
 
   return createServerClient(
@@ -18,7 +29,7 @@ export async function createClient() {
               cookieStore.set(name, value, options)
             )
           } catch {
-            // Called from a Server Component, cookies can't be set
+            // Called from a Server Component
           }
         },
       },

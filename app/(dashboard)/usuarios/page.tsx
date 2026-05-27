@@ -20,7 +20,7 @@ export default async function UsuariosPage() {
     .select('paid_by_user_id, status')
 
   const paymentCounts: Record<string, number> = {}
-  stats?.forEach((e) => {
+  stats?.forEach((e: { paid_by_user_id: string | null; status: string }) => {
     if (e.status === 'pago' && e.paid_by_user_id) {
       paymentCounts[e.paid_by_user_id] = (paymentCounts[e.paid_by_user_id] ?? 0) + 1
     }
@@ -36,7 +36,7 @@ export default async function UsuariosPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden mb-4">
-        {(users ?? []).map((u: User, idx) => (
+        {(users ?? []).map((u: User, idx: number) => (
           <div
             key={u.id}
             className={`flex items-center gap-4 px-5 py-4 ${
